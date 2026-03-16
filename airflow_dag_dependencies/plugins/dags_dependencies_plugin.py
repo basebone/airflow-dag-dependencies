@@ -646,21 +646,21 @@ async def dag_dependencies_graph():
                 .attr("stroke-width", 2)
                 .on("click", function(event, d) {
                     event.stopPropagation();
-                    // Focus: highlight this DAG + all upstream & downstream
-                    const query = `+${d.id}+`;
-                    document.getElementById('searchInput').value = query;
-                    handleSearch(query);
-                })
-                .on("dblclick", function(event, d) {
-                    event.stopPropagation();
-                    // Double-click opens the DAG in Airflow
-                    window.open(`/dags/${d.id}`, '_blank');
+                    if (event.ctrlKey || event.metaKey) {
+                        // Ctrl/Cmd+click opens the DAG in Airflow
+                        window.open(`/dags/${d.id}`, '_blank');
+                    } else {
+                        // Plain click focuses the DAG + upstream & downstream
+                        const query = `+${d.id}+`;
+                        document.getElementById('searchInput').value = query;
+                        handleSearch(query);
+                    }
                 })
                 .on("mouseover", function(event, d) {
                     d3.select(this).attr("stroke-width", 5);
                     const dagUrl = `/dags/${d.id}`;
                     tooltip.style("display", "block")
-                        .html(`<strong>${d.id}</strong><br>Schedule: ${d.schedule}<br>URL: <a href="${dagUrl}" target="_blank" style="color: #87ceeb;">${dagUrl}</a><br>Click to focus | Double-click to open DAG`)
+                        .html(`<strong>${d.id}</strong><br>Schedule: ${d.schedule}<br>URL: <a href="${dagUrl}" target="_blank" style="color: #87ceeb;">${dagUrl}</a><br>Click to focus | Ctrl+click to open DAG`)
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 10) + "px");
                 })
